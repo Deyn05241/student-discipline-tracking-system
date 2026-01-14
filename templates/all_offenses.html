@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}All Offenses - Analytics{% endblock %}
+
+{% block content %}
+    <h2>All Recorded Offenses</h2>
+
+    <!-- Search Form -->
+    <form method="GET" class="search-form" style="margin: 20px 0;">
+        <div style="display: flex; gap: 10px; max-width: 600px;">
+            <input type="text" 
+                   name="search" 
+                   value="{{ search }}" 
+                   placeholder="Search by student name, description or type..." 
+                   style="flex: 1; padding: 10px; font-size: 16px;">
+            <button type="submit" 
+                    style="padding: 10px 20px; background: #0078d7; color: white; border: none; cursor: pointer;">
+                Search
+            </button>
+        </div>
+    </form>
+
+    <!-- Results count -->
+    {% if search %}
+        <p>Found {{ pagination.total }} offenses matching "{{ search }}"</p>
+    {% else %}
+        <p>Total offenses: {{ pagination.total }}</p>
+    {% endif %}
+
+    <!-- Offenses Table -->
+    {% if offenses %}
+        <table class="offenses-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Student</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offense in offenses %}
+                    <tr>
+                        <td>{{ offense.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('offenses', id=offense.student.id) }}">
+                                {{ offense.student.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="offense-type {{ offense.offense_type }}">
+                                {{ offense.offense_type|capitalize }}
+                            </span>
+                        </td>
+                        <td>{{ offense.description or '—' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Simple pagination -->
+        <div class="pagination" style="margin-top: 25px;">
+            {% if pagination.has_prev %}
+                <a href="{{ url_for('all_offenses', page=pagination.prev_num, search=search) }}" 
+                   class="page-link">← Previous</a>
+            {% endif %}
+
+            <span class="current-page">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+            {% if pagination.has_next %}
+                <a href="{{ url_for('all_offenses', page=pagination.next_num, search=search) }}" 
+                   class="page-link">Next →</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p style="color: #666; font-style: italic;">
+            {% if search %}
+                No offenses found matching your search.
+            {% else %}
+                No offenses recorded yet.
+            {% endif %}
+        </p>
+    {% endif %}
+
+{% endblock %}

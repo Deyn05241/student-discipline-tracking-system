@@ -1,0 +1,120 @@
+<!-- templates/graphs.html -->
+{% extends "base.html" %}
+{% block title %}Graphs{% endblock %}
+{% block content %}
+    <h2>Offenses by Gender – Per Grade Level</h2>
+
+    <div class="charts-container">
+        <!-- We'll create one canvas per grade level dynamically -->
+    </div>
+
+    <script>
+        fetch('/api/offenses_by_gender_grade')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.querySelector('.charts-container');
+                
+                // Sort grades for better visual order (optional)
+                const grades = Object.keys(data).sort();
+
+                grades.forEach(grade => {
+                    const male = data[grade].Male || 0;
+                    const female = data[grade].Female || 0;
+
+                    // Skip grades with no offenses
+                    if (male === 0 && female === 0) return;
+
+                    // Create wrapper for each chart
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.className = 'chart-wrapper';
+
+                    // Title
+                    const title = document.createElement('h3');
+                    title.textContent = `Grade ${grade}`;
+                    chartWrapper.appendChild(title);
+
+                    // Canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 320;
+                    canvas.height = 320;
+                    chartWrapper.appendChild(canvas);
+
+                    container.appendChild(chartWrapper);
+
+                    // Create pie chart
+                    const ctx = canvas.getContext('2d');
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Male', 'Female'],
+                            datasets: [{
+                                data: [male, female],
+                                backgroundColor: [
+                                    'rgba(54, 162, 235, 0.75)',   // blue - male
+                                    'rgba(255, 99, 132, 0.75)'    // pink/red - female
+                                ],
+                                borderColor: 'white',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: false,  // important for fixed size
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        font: { size: 13 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            let value = context.parsed;
+                                            let total = context.dataset.data.reduce((a,b)=>a+b,0);
+                                            let percentage = total > 0 ? ((value/total)*100).toFixed(1) : 0;
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+
+                // If no data at all
+                if (container.children.length === 0) {
+                    container.innerHTML = '<p style="color:#666; font-style:italic;">No offense data recorded yet.</p>';
+                }
+            })
+            .catch(err => {
+                console.error('Error loading chart data:', err);
+                document.querySelector('.charts-container').innerHTML = 
+                    '<p style="color:red;">Failed to load charts. Please try again later.</p>';
+            });
+    </script>
+
+    <style>
+        .charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        .chart-wrapper {
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 360px;
+        }
+        .chart-wrapper h3 {
+            margin: 0 0 12px 0;
+            color: #0078d7;
+            font-size: 1.3em;
+        }
+    </style>
+{% endblock %}

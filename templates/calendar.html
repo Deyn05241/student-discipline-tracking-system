@@ -1,0 +1,50 @@
+<!-- templates/calendar.html -->
+{% extends "base.html" %}
+{% block title %}Calendar for {{ student.name }} - {{ month_name }} {{ year }}{% endblock %}
+{% block content %}
+    <h2>Calendar for {{ student.name }} - {{ month_name }} {{ year }}</h2>
+    <div>
+        <a href="{{ url_for('calendar_view', id=student.id, year=prev_year, month=prev_month) }}">Previous Month</a> |
+        <a href="{{ url_for('calendar_view', id=student.id, year=next_year, month=next_month) }}">Next Month</a>
+    </div>
+    <table class="calendar">
+        <thead>
+            <tr>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week in month_days %}
+                <tr>
+					{% for day in week %}
+         			{% if day == 0 %}
+                		<td></td>
+            		{% else %}
+                		{% set day_offenses = offense_dates[day] %}  <!-- list of strings -->
+                		{% set has_offenses = day_offenses | length > 0 %}
+               			{% set tooltip_text = day_offenses | join('\n') if has_offenses else '' %}
+
+                		<td
+                    		{% if has_offenses %}
+                        		class="offense-day"
+                        		title="{{ tooltip_text }}"
+                    		{% endif %}
+                		>
+                    		{{ day }}
+                    		{% if has_offenses %}
+                        		<span class="offense-count">({{ day_offenses | length }})</span>
+                    		{% endif %}
+               			 </td>
+            {% endif %}
+        {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

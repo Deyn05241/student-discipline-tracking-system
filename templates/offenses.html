@@ -1,0 +1,33 @@
+<!-- templates/offenses.html -->
+{% extends "base.html" %}
+{% block title %}Offenses for {{ student.name }}{% endblock %}
+{% block content %}
+    <h2>Offenses for {{ student.name }}</h2>
+    <a href="{{ url_for('add_offense', id=student.id) }}">Add Offense</a>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offense in offenses %}
+                <tr>
+                    <td>{{ offense.id }}</td>
+                    <td>{{ offense.offense_type }}</td>
+                    <td>{{ offense.date }}</td>
+                    <td>{{ offense.description }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_offense', id=offense.id) }}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

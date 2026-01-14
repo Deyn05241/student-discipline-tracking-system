@@ -1,0 +1,46 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="{{ url_for('static', filename='TPS-logo.png') }}" 
+                 alt="School Logo" 
+                 class="school-logo">
+			<div class="header-text">
+                <h1>Student Discipline Tracking System</h1>
+                <p class="subtitle">12-D Group 4 | RDL 2</p>
+			</div>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('students') }}">Students</a> |
+			<a href="{{ url_for('all_offenses') }}">All Offenses</a> |
+            <a href="{{ url_for('graphs') }}">Graphs & Analytics</a> |
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!-- templates/student_form.html -->
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <h2>{{ title }}</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.name.label }} {{ form.name() }}</p>
+        <p>{{ form.age.label }} {{ form.age() }}</p>
+        <p>{{ form.gender.label }} {{ form.gender() }}</p>
+        <p>{{ form.grade_level.label }} {{ form.grade_level() }}</p>
+        <p>{{ form.section.label }} {{ form.section() }}</p>
+        <p>{{ form.strand.label }} {{ form.strand() }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
